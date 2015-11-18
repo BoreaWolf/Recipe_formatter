@@ -14,6 +14,8 @@ FONTS_PATH = "./fonts/"
 FONTS_EXTENSION = ".ttf"
 RECIPES_PATH = "./recipes/"
 
+ERROR_WEBSITE_NOT_AVAILABLE = "This site is not available yet, sorry! へ‿(ツ)‿ㄏ"
+
 DEFAULT_MARGIN = 36
 FONT_SIZE_TITLES = 100
 FONT_SIZE_INGREDIENTS = 50
@@ -113,6 +115,9 @@ elsif link.include? "alice" then
 	recipe[:ingredients].map!{ |ingr| ingr.gsub( /(\n|\t|\s)+:(\n|\t|\s)+/, ": " ).strip }
 	recipe[:procedure] = content.css( "div.passaggi_text" ).to_a.map!{ |step| step.text }
 	recipe[:advice] = ""
+else
+	puts ERROR_WEBSITE_NOT_AVAILABLE
+	return
 end
 
 # Dropping multi space
