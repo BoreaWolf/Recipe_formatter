@@ -55,7 +55,7 @@ if link.include? "ricette.giallozafferano" then
 	# Giallo Zafferano Ricette
 	content = content.css( "article#content" )
 	recipe[:name] = content.css( "h1" )[ 0 ].text
-	recipe[:photo] = content.css( "figure#cover img" )[ 0 ][ "src" ]
+	recipe[:photo] = content.css( "img" ).select{ |img| img["alt"] == recipe[:name] }[ 0 ][ "src" ]
 
 	content = content.css( "div.right-push" )
 	recipe[:people] = content.css( "li.yield strong" ).text
@@ -106,9 +106,7 @@ elsif link.include? "alice" then
 	# Alice.tv
 	content = content.css( "div#left-area" )
 	recipe[:name] = content.css( "h1.ricette" ).text
-	puts "#{content.css( "img" ).select{ |img| img["alt"] == recipe[:name]}}"
-	recipe[:photo] = content.css( "img" )[ 0 ][ "src" ]
-	puts "#{recipe[:photo]}"
+	recipe[:photo] = content.css( "img" ).select{ |img| img["alt"] == recipe[:name] }[ 0 ][ "src" ]
 	recipe[:presentation] = "" 
 	recipe[:people] = ""
 	recipe[:ingredients] = content.css( "div.ingredienti" ).to_a.map!{ |ingr| LIST_INGREDIENT + ingr.css( "span" ).text }
