@@ -5,3 +5,7 @@ recipes/*
 # Keeping the empty folders
 !images/.gitkeep
 !recipes/.gitkeep
+
+# Swap files
+**/.*.swp
+
