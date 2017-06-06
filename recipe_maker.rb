@@ -167,14 +167,14 @@ Prawn::Document.generate( pdf_filename,
 	# Ingredients
 	ingr_box_size = [ REAL_PAGE_DIM[ 0 ] * RATE_INGR_WIDTH, REAL_PAGE_DIM[ 1 ] * RATE_INGR_HEIGHT ]
 	pdf_file.bounding_box( [ 0, pdf_file.cursor ], :width => ingr_box_size[ 0 ], :height => ingr_box_size[ 1 ] ) do
-		pdf_file.font( "Montez-Regular", :size => FONT_SIZE_TITLES ) do
+		pdf_file.font( "Montez_Regular", :size => FONT_SIZE_TITLES ) do
 			pdf_file.pad_top( PADDING_TOP_INGREDIENTS + PADDING_TITLES ) { pdf_file.text TITLE_INGREDIENTS, :align => :center }
 		end
 
-		pdf_file.font( "Montez-Regular", :size => FONT_SIZE_PEOPLE ) do
+		pdf_file.font( "Montez_Regular", :size => FONT_SIZE_PEOPLE ) do
 			pdf_file.text recipe[:people], :align => :center
 		end
-		pdf_file.font( "AmaticSC-Regular", :size => FONT_SIZE_INGREDIENTS ) do
+		pdf_file.font( "AmaticSC_Regular", :size => FONT_SIZE_INGREDIENTS ) do
 			pdf_file.text_box recipe[:ingredients].join( "\n" ),
 							  :at => [ PADDING_LATERAL, ingr_box_size[ 1 ] -
 										( FONT_SIZE_TITLES + 2 * PADDING_TITLES +
@@ -189,7 +189,7 @@ Prawn::Document.generate( pdf_filename,
 	# Procedure
 	proc_box_size = [ REAL_PAGE_DIM[ 0 ] * RATE_PROC_WIDTH, REAL_PAGE_DIM[ 1 ] * RATE_PROC_HEIGHT ]
 	pdf_file.bounding_box( [ ingr_box_size[ 0 ], pdf_file.cursor + ingr_box_size[ 1 ] ], :width => proc_box_size[ 0 ], :height => proc_box_size[ 1 ] ) do
-		pdf_file.font( "Montez-Regular", :size => FONT_SIZE_TITLES ) do
+		pdf_file.font( "Montez_Regular", :size => FONT_SIZE_TITLES ) do
 			pdf_file.pad( PADDING_TITLES ) { pdf_file.text TITLE_PROCEDURE, :align => :center }
 		end
 		pdf_file.font( "Walkway_Oblique", :size => FONT_SIZE_TEXT ) do
@@ -205,7 +205,7 @@ Prawn::Document.generate( pdf_filename,
 	if recipe[:advice] != "" then
 		adv_box_size = [ REAL_PAGE_DIM[ 0 ], REAL_PAGE_DIM[ 1 ] * RATE_ADV_HEIGHT ]
 		pdf_file.bounding_box( [ 0, pdf_file.cursor ], :width => adv_box_size[ 0 ], :height => adv_box_size[ 1 ] ) do
-			pdf_file.font( "Montez-Regular", :size => FONT_SIZE_TITLES ) do
+			pdf_file.font( "Montez_Regular", :size => FONT_SIZE_TITLES ) do
 				pdf_file.pad( PADDING_TITLES ) { pdf_file.text TITLE_ADVICE, :align => :center }
 			end
 
