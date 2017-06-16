@@ -115,9 +115,18 @@ elsif link.include? "alice" then
 	recipe[:ingredients].map!{ |ingr| ingr.gsub( /(\n|\t|\s)+:(\n|\t|\s)+/, ": " ).strip }
 	recipe[:procedure] = content.css( "div.passaggi_text" ).to_a.map!{ |step| step.text }
 	recipe[:advice] = ""
+elsif link.include? "misya" then
+	content = content.css( "div.row" )
+	recipe[:name] = content.css( "h1" ).text
+	recipe[:photo] = content.css( "img" ).select{ |img| img["alt"] == recipe[:name] }[ 0 ][ "src" ]
+	recipe[:presentation] = "" 
+	recipe[:people] = content.css( "div.tit-ingr" ).text.gsub( /Ingredienti per |:/, "" ).capitalize
+	recipe[:ingredients] = content.css( "ul.list-ingr li" ).map{ |ingr| ingr.text.strip.capitalize }
+	recipe[:procedure] = content.css( "div" ).select{ |div| div["name"] == "istruzioni" }.first
+	recipe[:procedure] = recipe[:procedure].css( "p" ).select{ |p| p.text != "" and !p.text.include? "video" }.map{ |p| p.text.strip } 
+	recipe[:advice] = ""
 else
-	puts ERROR_WEBSITE_NOT_AVAILABLE
-	return
+	abort( ERROR_WEBSITE_NOT_AVAILABLE )
 end
 
 # Dropping multi space
