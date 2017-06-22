@@ -74,8 +74,10 @@ if link.include? "ricette.giallozafferano" then
 	recipe[:procedure].shift
 	recipe[:procedure].map!{ |elem| elem.text }
 	recipe[:procedure].map!{ |elem| elem.sub( adv, "" ) }
-	recipe[:procedure].map!{ |elem| elem.gsub( /\s\(\d+(-\d+)?\)/, "" ) }
 	recipe[:procedure].map!{ |elem| elem unless elem.start_with?( "\n\t" ) }.compact!
+	# Removing the image references from the text
+	recipe[:procedure].map!{ |elem| elem.gsub( /(\s|\S)\(\d+(-\d+)?\)/, "" ) }
+
 	recipe[:advice] = content.css( "div.consiglio p" ).text
 elsif link.include? "blog.giallozafferano" then
 	# Giallo Zafferano Blog
