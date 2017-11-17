@@ -79,6 +79,44 @@ if link.include? "ricette.giallozafferano" then
 	recipe[:procedure].map!{ |elem| elem.gsub( /(\s|\S)\(\d+(-\d+)?\)/, "" ) }
 
 	recipe[:advice] = content.css( "div.consiglio p" ).text
+elsif link.include? "cucinafacileconelena" then
+	content = content.css( "div#content" )
+	recipe[:name] = content.css( "h1.entry-title" ).text
+	recipe[:photo] = content.css( "img" ).select{ |x| x[ "src" ].include? recipe[:name].downcase.gsub!( /\s/, "-" ) }
+	recipe[:photo] = recipe[:photo].map!{ |x| x[ "src" ] }[ 0 ]
+
+	content = content.css( "div.entry-content p" )
+	procedure_start = 0
+	ingrs = Array.new
+	content.each_with_index do |par, i|
+		if par.text.start_with? "Procedimento:" then
+			# Saving the element where the procedure starts
+			procedure_start = i
+			break
+		else
+			# Saving the ingredients and the number of people/portions
+			ingrs.push( par.text )
+		end
+	end
+	ingrs[ 0 ] = ingrs[ 0 ].split( "dosi per " )[ 1 ].split( ":\n" )
+	recipe[:people] = ingrs[ 0 ][ 0 ]
+	ingrs[ 0 ] = ingrs[ 0 ][ 1 ]
+	ingrs = ingrs.join( "\n" ).split( "\n" )
+	recipe[:ingredients] = Array.new
+	ingrs.each do |ingr|
+		recipe[:ingredients].push( LIST_INGREDIENT + ingr )
+	end
+
+	recipe[:procedure] = Array.new
+	for i in procedure_start...content.length
+		recipe[:procedure].push( content[ i ].text )
+	end
+	recipe[:procedure][ 0 ].gsub!( "Procedimento:\n", "" )
+	recipe[:procedure].map!{ |x| x.split( "\n" ) }.flatten!
+	recipe[:procedure].map!{ |x| x.gsub!( /[^\x00-\x7FÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù’]/, "" ) }
+	recipe[:procedure].reject{ |x| x.nil? or x.empty? }.map!{ |x| x.strip }
+
+	recipe[:advice] = ""
 elsif link.include? "blog.giallozafferano" then
 	# Giallo Zafferano Blog
 	# This site sucks a$$
