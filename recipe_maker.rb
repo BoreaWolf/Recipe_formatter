@@ -165,6 +165,15 @@ elsif link.include? "misya" then
 	recipe[:procedure] = content.css( "div" ).select{ |div| div["name"] == "istruzioni" }.first
 	recipe[:procedure] = recipe[:procedure].css( "p" ).select{ |p| p.text != "" and !p.text.include? "video" }.map{ |p| p.text.strip } 
 	recipe[:advice] = ""
+elsif link.include? "biggerbolderbaking" then
+	content = content.css( "div.easyrecipe" )
+	recipe[:name] = content.css( "div.ERSName" ).text
+	recipe[:photo] = content.css( "img" )[ 0 ][ "src" ]
+	recipe[:presentation] = "" 
+	recipe[:people] = content.css( "div.ERSServes" ).text.gsub( /Serves: /, "" ).capitalize
+	recipe[:ingredients] = content.css( "div.ERSIngredients li" ).map{ |ingr| ingr.text.strip.capitalize }
+	recipe[:procedure] = content.css( "div.ERSInstructions li" ).map{ |element| element.text }
+	recipe[:advice] = content.css( "div.ERSNotes" ).text
 else
 	abort( ERROR_WEBSITE_NOT_AVAILABLE )
 end
