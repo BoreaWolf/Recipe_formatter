@@ -53,13 +53,42 @@ content = Nokogiri::HTML( open( link, &:read ) )
 
 if link.include? "ricette.giallozafferano" then
 	# Giallo Zafferano Ricette
-	content = content.css( "article#content" )
-	recipe[:name] = content.css( "h1" )[ 0 ].text
-	recipe[:photo] = content.css( "img" ).select{ |img| img["alt"] == recipe[:name] }[ 0 ][ "src" ]
+	#   content = content.css( "article#content" )
+	#   recipe[:name] = content.css( "h1" )[ 0 ].text
+	#   recipe[:photo] = content.css( "img" ).select{ |img| img["alt"] == recipe[:name] }[ 0 ][ "src" ]
 
-	content = content.css( "div.right-push" )
-	recipe[:people] = content.css( "li.yield strong" ).text
-	recipe[:ingredients] = content.css( "dl dd.ingredient" )
+	#   content = content.css( "div.right-push" )
+	#   recipe[:people] = content.css( "li.yield strong" ).text
+	#   recipe[:ingredients] = content.css( "dl dd.ingredient" )
+	#   ingrs = Array.new
+	#   recipe[:ingredients].each do |ingr|
+	#   	ingrs.push( LIST_INGREDIENT + ingr.text.gsub( /(\n|\t|,)+/, " " ).gsub( /\s+/, " " ).strip )
+	#   end
+	#   recipe[:ingredients] = ingrs
+	#   
+	#   # Looking for some stupid advertisements
+	#   adv = content.css( "div.btesto p" ).text
+	#   recipe[:procedure] = content.css( "p" )
+	#   recipe[:procedure] = recipe[:procedure].select{ |p| p["class"].class == NilClass and p["id"].class == NilClass }
+	#   recipe[:presentation] = recipe[:procedure][ 0 ].text
+	#   recipe[:procedure].shift
+	#   recipe[:procedure].map!{ |elem| elem.text }
+	#   recipe[:procedure].map!{ |elem| elem.sub( adv, "" ) }
+	#   recipe[:procedure].map!{ |elem| elem unless elem.start_with?( "\n\t" ) }.compact!
+	#   # Removing the image references from the text
+	#   recipe[:procedure].map!{ |elem| elem.gsub( /(\s|\S)\(\d+(-\d+)?\)/, "" ) }
+
+	#   recipe[:advice] = content.css( "div.consiglio p" ).text
+
+    # New website layout
+    content = content.css( "div.gz-content" )
+	recipe[:name] = content.css( "h1" ).text
+    recipe[:photo] = content.css( ".gz-content-recipe picture source" ).
+        select{ |element| element[ "data-srcset" ].include?( "http" ) }[ 0 ][ "data-srcset" ]
+
+	preparation_details = content.css( ".gz-list-ingredients" )
+    recipe[:people] = preparation_details.css( "dt" ).last.text.gsub( "Ingredienti ", "" )
+	recipe[:ingredients] = preparation_details.css( "dd.gz-ingredient" )
 	ingrs = Array.new
 	recipe[:ingredients].each do |ingr|
 		ingrs.push( LIST_INGREDIENT + ingr.text.gsub( /(\n|\t|,)+/, " " ).gsub( /\s+/, " " ).strip )
@@ -68,17 +97,28 @@ if link.include? "ricette.giallozafferano" then
 	
 	# Looking for some stupid advertisements
 	adv = content.css( "div.btesto p" ).text
-	recipe[:procedure] = content.css( "p" )
-	recipe[:procedure] = recipe[:procedure].select{ |p| p["class"].class == NilClass and p["id"].class == NilClass }
-	recipe[:presentation] = recipe[:procedure][ 0 ].text
-	recipe[:procedure].shift
-	recipe[:procedure].map!{ |elem| elem.text }
+    recipe_steps = content.css( ".gz-content-recipe-step" )
+	procedure = recipe_steps.css( "p" )
+	procedure = procedure.select{ |p| p["class"].class == NilClass and p["id"].class == NilClass }
+    recipe[:procedure] = Array.new
+    procedure.each do |elem|
+        current_step = ""
+        elem.children.each do |child|
+            if child.attributes.empty? then
+                current_step += child.text
+                if current_step[ -1 ] == " " then
+                    current_step = current_step[ 0...-1 ]
+                end
+            end
+        end
+        recipe[:procedure].append( current_step )
+    end
 	recipe[:procedure].map!{ |elem| elem.sub( adv, "" ) }
 	recipe[:procedure].map!{ |elem| elem unless elem.start_with?( "\n\t" ) }.compact!
 	# Removing the image references from the text
 	recipe[:procedure].map!{ |elem| elem.gsub( /(\s|\S)\(\d+(-\d+)?\)/, "" ) }
 
-	recipe[:advice] = content.css( "div.consiglio p" ).text
+    recipe[:advice] = content.css( ".gz-content-recipe" ).last.text
 elsif link.include? "cucinafacileconelena" then
 	content = content.css( "div#content" )
 	recipe[:name] = content.css( "h1.entry-title" ).text
